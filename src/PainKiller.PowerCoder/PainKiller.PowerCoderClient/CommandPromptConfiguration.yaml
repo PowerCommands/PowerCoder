@@ -1,0 +1,38 @@
+version: 1.0
+configuration:
+  powerCoder:    
+    findSearchTerms:
+    - Swedish words or phrases
+    - more then two word
+  core:
+    name: Power Coder
+    version: 1.0
+    prompt: cp>
+    defaultCommand: ''
+    showLogo: true
+    suggestions:  
+    - exit
+    - cd PainKiller.CommandPrompt.CoreLib\Core
+    roamingDirectory: CommandPrompt
+    modules:
+      security:
+        secrets:
+        - name: CommandPrompt_encryptionManager
+          options:
+            target: User
+      storage:
+        applicationDataFolder: $ROAMING$\PowerCoder
+        backupPath: $ROAMING$\PowerCoder\backup
+      ollama:
+        baseAddress: localhost
+        port: 11434
+        model: gemma3:latest
+      infoPanel:
+        enabled: true
+        height: 2
+        updateIntervalSeconds: -1
+  log:
+    fileName: commandprompt.log
+    filePath: logs
+    rollingIntervall: Day
+    restrictedToMinimumLevel: Debug
