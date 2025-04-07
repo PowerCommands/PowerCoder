@@ -92,7 +92,17 @@ public class OllamaService : IOllamaService
         return "Unexpected respond from Ollama-server.";
     }
     public void AddMessage(ChatMessage message) => _messages.Add(message);
-
+    public void ClearChatMessages()
+    {
+        _messages.Clear();
+        _logger.LogInformation("Chat history cleared.");
+    }
+    public void Reset()
+    {
+        ClearChatMessages();
+        AddMessage(new ChatMessage("system", "Forget all previous conversations. Start a new session."));
+        _logger.LogInformation("Chat history cleared and new session initiated.");
+    }
     public void ShowInstalledModels()
     {
         try

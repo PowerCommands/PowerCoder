@@ -26,11 +26,13 @@ public class FindCommand : ConsoleCommandBase<CommandPromptConfiguration>
         var search = DialogService.ChooseFromOptions("Pick a search criteria!", Configuration.PowerCoder.FindSearchTerms.ToList());
         var files = Directory.GetFiles(path, "*.cs", SearchOption.AllDirectories);
         Writer.Clear();
-        Writer.WriteDescription("Criteria", $"{SearchCodeLinesPrompt.Criteria} {search}");
+        service.Reset();
+
+        Writer.WriteDescription("Criteria", $"{SearchCodePrompt.Criteria} {search}");
         foreach (var file in files)
         {
             var content = File.ReadAllText(file);
-            var prompt = new SearchCodeLinesPrompt().GeneratePrompt(search, new FileInfo(file).Name, content);
+            var prompt = new SearchCodePrompt().GeneratePrompt(search, new FileInfo(file).Name, content);
             service.AddMessage(new ChatMessage("user", prompt));
             var response = service.SendChatToOllama().GetAwaiter().GetResult();
             Writer.WriteLine(response);

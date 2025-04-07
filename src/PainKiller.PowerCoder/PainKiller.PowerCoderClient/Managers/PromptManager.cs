@@ -8,7 +8,7 @@ public class PromptManager
 
     public PromptManager()
     {
-        _prompts.Add(new SearchCodeLinesPrompt());
+        _prompts.Add(new SearchCodePrompt());
     }
     public IPrompt? GetPrompt(string promptId) => _prompts.FirstOrDefault(p => p.PromptId.Equals(promptId, StringComparison.OrdinalIgnoreCase));
 }

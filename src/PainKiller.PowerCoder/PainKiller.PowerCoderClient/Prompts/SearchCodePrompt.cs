@@ -2,7 +2,7 @@
 
 namespace PainKiller.PowerCoderClient.Prompts;
 
-public class SearchCodeLinesPrompt : IPrompt
+public class SearchCodePrompt : IPrompt
 {
     public string PromptId => "search";
     public static string Criteria => $"Your task is to find lines of code that contains ";
