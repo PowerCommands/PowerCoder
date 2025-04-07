@@ -2,8 +2,8 @@ version: 1.0
 configuration:
   powerCoder:    
     findSearchTerms:
-    - Swedish words or phrases
-    - more then two word
+    - "Swedish words or phrases"
+    - "Find all lines in the code that: 1. Start with the keyword ''namespace'' (possibly preceded by whitespace). 2. End with a semicolon ';' (possibly followed by whitespace)." 
   core:
     name: Power Coder
     version: 1.0

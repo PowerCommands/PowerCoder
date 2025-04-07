@@ -5,38 +5,28 @@ namespace PainKiller.PowerCoderClient.Commands;
 [CommandDesign(     description: "Start your coding with this command", 
                         options: [""],
                        examples: ["//Start coding","code"])]
-public class FindCommand : PowerCodeBaseCommando
+public class PatternCommand : PowerCodeBaseCommando
 {
-    public FindCommand(string identifier) : base(identifier)  => EventBusService.Service.Subscribe<WorkingDirectoryChangedEventArgs>(OnWorkingDirectoryChanged);
+    public PatternCommand(string identifier) : base(identifier)  => EventBusService.Service.Subscribe<WorkingDirectoryChangedEventArgs>(OnWorkingDirectoryChanged);
     
     public override RunResult Run(ICommandLineInput input)
     {
-        var config = Configuration.Core.Modules.Ollama;
-        var service = OllamaService.GetInstance(config.BaseAddress, config.Port, config.Model);
         var path = input.GetFullPath();
         if (string.IsNullOrWhiteSpace(path) || (!File.Exists(path) && !Directory.Exists(path)))
         {
             Writer.WriteLine("Please provide a valid path to a file or directory.");
             return Nok("Invalid file path.");
         }
-        var search = DialogService.ChooseFromOptions("Pick a search criteria!", Configuration.PowerCoder.FindSearchTerms.ToList());
+        var search = DialogService.ChooseFromOptions("Pick a search criteria!", Configuration.PowerCoder.FindPatterns.ToList());
         var files = Directory.GetFiles(path, "*.cs", SearchOption.AllDirectories);
         Writer.Clear();
-        service.Reset();
 
         var searchPrompt = new SearchCodePrompt("search", search, ["namespace MyNamespace;"]);
         Writer.WriteDescription("Criteria", $"{searchPrompt.Criteria} {search}");
-        
         foreach (var file in files)
         {
             var content = File.ReadAllText(file);
             var prompt = searchPrompt.GeneratePrompt(file, content);
-            service.AddMessage(new ChatMessage("user", prompt));
-            var response = service.SendChatToOllama().GetAwaiter().GetResult();
-            if(response.Length > 1000) Writer.WriteLine($"{file} = No match");
-            else if(response.ToLower().Contains("no match")) Writer.WriteLine(response);
-            else Writer.WriteSuccessLine(response);
-            service.AddMessage(new ChatMessage("assistant", response));
         }
         while (true)
         {

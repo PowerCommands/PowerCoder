@@ -3,5 +3,7 @@
 public interface IPrompt
 {
     string PromptId { get; }
-    string GeneratePrompt(string searchTerm, string fileName, string searchContent);
+    string Criteria { get; }
+    List<string> Examples { get; }
+    string GeneratePrompt(string fileName, string content);
 }

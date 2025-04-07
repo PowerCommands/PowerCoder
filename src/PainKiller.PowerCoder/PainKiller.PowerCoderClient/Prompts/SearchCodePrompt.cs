@@ -2,34 +2,34 @@
 
 namespace PainKiller.PowerCoderClient.Prompts;
 
-public class SearchCodePrompt : IPrompt
+public class SearchCodePrompt(string promptId, string criteria, List<string> examples) : IPrompt
 {
-    public string PromptId => "search";
-    public static string Criteria => $"Your task is to find lines of code that contains ";
-    public string GeneratePrompt(string searchTerm, string fileName, string searchContent)
+    public string PromptId { get; } = promptId; 
+    public string Criteria { get; } = criteria;
+    public List<string> Examples { get; } = examples;
+
+    public string GeneratePrompt(string fileName, string content)
     {
+        var example = string.Join("\n", Examples.Select((x, i) => $"{i + 1}: [line content containing {x}]"));
         return $@"
-You are a language model specialized in analyzing code files. Your task is to find lines of code that contain {searchTerm}.
+You are a language model specialized in analyzing code files. Your task is to find lines of code that contain {Criteria}.
 
-Input: The following message will contain the code to analyze.
 
-Output: If no lines contain {searchTerm}, respond with:
-class name = no match
 
-If any lines contain {searchTerm}, respond with a list of matching lines. Format your response as a plain text list, where each line contains the file line number followed by the actual line content. Only include lines that match the given criteria.
+Output: If no lines contain {Criteria}, respond with:
+{fileName} = no match
+
+If any lines contain {Criteria}, respond with a list of matching lines. Format: [line number]: [line content]
 
 Example output (if there are matches):
 Find matches in {fileName}
-1: [line content containing '{searchTerm}']
-5: [line content containing '{searchTerm}']
-12: [line content containing '{searchTerm}']
+{example}
 
 Example output (if there are no matches):
 {fileName} = no match
 
-End of instruction now analyze the code below.
+Input: This message contains the search content and a file name. The file name is {fileName}. The content of the file is as follows:
 
-{fileName}
-{searchContent}";
+{content}";
     }
 }
