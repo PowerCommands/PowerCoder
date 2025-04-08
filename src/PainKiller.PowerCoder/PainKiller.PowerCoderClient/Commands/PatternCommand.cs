@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using PainKiller.PowerCoderClient.BaseClasses;
+using PainKiller.PowerCoderClient.Data;
 using PainKiller.PowerCoderClient.DomainObjects;
 
 namespace PainKiller.PowerCoderClient.Commands;
@@ -9,6 +10,7 @@ namespace PainKiller.PowerCoderClient.Commands;
                        examples: ["//Add a pattern","pattern --add"])]
 public class PatternCommand : PowerCodeBaseCommando
 {
+    protected ObjectStorageBase<CodePatterns, CodePattern> CodePatterns = new();
     public PatternCommand(string identifier) : base(identifier)  => EventBusService.Service.Subscribe<WorkingDirectoryChangedEventArgs>(OnWorkingDirectoryChanged);
     
     public override RunResult Run(ICommandLineInput input)
