@@ -1,8 +1,8 @@
 ﻿using PainKiller.PowerCoderClient.Contracts;
 
-namespace PainKiller.PowerCoderClient.Prompts;
+namespace PainKiller.PowerCoderClient.DomainObjects;
 
-public class SearchCodePrompt(string promptId, string criteria, List<string> examples) : IPrompt
+public class CriteriaCodePrompt(string promptId, string criteria, List<string> examples) : IPrompt
 {
     public string PromptId { get; } = promptId; 
     public string Criteria { get; } = criteria;

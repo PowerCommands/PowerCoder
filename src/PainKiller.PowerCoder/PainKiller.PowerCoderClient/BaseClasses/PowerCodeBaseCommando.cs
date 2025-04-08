@@ -1,6 +1,10 @@
+using PainKiller.PowerCoderClient.Data;
+using PainKiller.PowerCoderClient.DomainObjects;
+
 namespace PainKiller.PowerCoderClient.BaseClasses;
 public abstract class PowerCodeBaseCommando(string identifier) : ConsoleCommandBase<CommandPromptConfiguration>(identifier)
 {
+    protected ObjectStorageBase<CodePatterns, CodePattern> CodePatterns = new();
     public override void OnInitialized()
     {
         Environment.CurrentDirectory = new DirectoryInfo(AppContext.BaseDirectory).GetRoot().FullName;

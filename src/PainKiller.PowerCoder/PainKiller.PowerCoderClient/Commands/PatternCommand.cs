@@ -1,41 +1,54 @@
+using System.Text.RegularExpressions;
 using PainKiller.PowerCoderClient.BaseClasses;
+using PainKiller.PowerCoderClient.DomainObjects;
 
 namespace PainKiller.PowerCoderClient.Commands;
 
-[CommandDesign(     description: "Start your coding with this command", 
-                        options: [""],
-                       examples: ["//Start coding","code"])]
+[CommandDesign(     description: "Search for certain pattern.", 
+                        options: ["add"],
+                       examples: ["//Add a pattern","pattern --add"])]
 public class PatternCommand : PowerCodeBaseCommando
 {
     public PatternCommand(string identifier) : base(identifier)  => EventBusService.Service.Subscribe<WorkingDirectoryChangedEventArgs>(OnWorkingDirectoryChanged);
     
     public override RunResult Run(ICommandLineInput input)
     {
+        if (input.HasOption("add")) return Add();
+
         var path = input.GetFullPath();
         if (string.IsNullOrWhiteSpace(path) || (!File.Exists(path) && !Directory.Exists(path)))
         {
             Writer.WriteLine("Please provide a valid path to a file or directory.");
             return Nok("Invalid file path.");
         }
-        var search = DialogService.ChooseFromOptions("Pick a search criteria!", Configuration.PowerCoder.FindPatterns.ToList());
+        var selectedPattern = DialogService.ChooseFromOptions("Pick a pattern!", CodePatterns.GetItems().Select(p => p.Id).ToList());
         var files = Directory.GetFiles(path, "*.cs", SearchOption.AllDirectories);
         Writer.Clear();
 
-        var searchPrompt = new SearchCodePrompt("search", search, ["namespace MyNamespace;"]);
-        Writer.WriteDescription("Criteria", $"{searchPrompt.Criteria} {search}");
+        var codePattern = CodePatterns.GetItems().First(p => p.Id == selectedPattern);
+        Writer.WriteLine(codePattern.Pattern);
         foreach (var file in files)
         {
-            var content = File.ReadAllText(file);
-            var prompt = searchPrompt.GeneratePrompt(file, content);
+            var rows = File.ReadAllText(file).Split('\n');
+            var patternMatch = false;
+            foreach (var row in rows)
+            {
+                if(string.IsNullOrEmpty(row)) continue;
+                if (Regex.IsMatch(row, codePattern.Pattern))
+                {
+                    patternMatch = true;
+                }
+            }
+            if (!patternMatch == codePattern.AntiPattern) Writer.WriteSuccessLine($"[MATCH   ] {file}");
         }
-        while (true)
-        {
-            Writer.Write("Any further questions?> ");
-            var userInput = Console.ReadLine();
-            
-            if (string.IsNullOrWhiteSpace(userInput)) continue;
-            if (userInput.Trim().Equals("/bye", StringComparison.OrdinalIgnoreCase)) break;
-        }
+        return Ok();
+    }
+    private RunResult Add()
+    {
+        var id = DialogService.QuestionAnswerDialog("Id of your pattern: ");
+        var pattern = DialogService.QuestionAnswerDialog("Pattern: ");
+        var isAntiPattern = DialogService.YesNoDialog("Is anti pattern (means match is not success) : ");
+        CodePatterns.Insert(new CodePattern { Id = id, Pattern = pattern, AntiPattern = isAntiPattern }, codePattern => codePattern.Id == id);
         return Ok();
     }
 }

@@ -1,13 +1,14 @@
 using PainKiller.PowerCoderClient.BaseClasses;
+using PainKiller.PowerCoderClient.DomainObjects;
 
 namespace PainKiller.PowerCoderClient.Commands;
 
-[CommandDesign(     description: "Start your coding with this command", 
+[CommandDesign(     description: "Find something in your code using AI LLM model.", 
                         options: [""],
-                       examples: ["//Start coding","code"])]
-public class FindCommand : PowerCodeBaseCommando
+                       examples: ["//Run selected criteria","criteria"])]
+public class CriteriaCommand : PowerCodeBaseCommando
 {
-    public FindCommand(string identifier) : base(identifier)  => EventBusService.Service.Subscribe<WorkingDirectoryChangedEventArgs>(OnWorkingDirectoryChanged);
+    public CriteriaCommand(string identifier) : base(identifier)  => EventBusService.Service.Subscribe<WorkingDirectoryChangedEventArgs>(OnWorkingDirectoryChanged);
     
     public override RunResult Run(ICommandLineInput input)
     {
@@ -24,7 +25,7 @@ public class FindCommand : PowerCodeBaseCommando
         Writer.Clear();
         service.Reset();
 
-        var searchPrompt = new SearchCodePrompt("search", search, ["namespace MyNamespace;"]);
+        var searchPrompt = new CriteriaCodePrompt("search", search, ["namespace MyNamespace;"]);
         Writer.WriteDescription("Criteria", $"{searchPrompt.Criteria} {search}");
         
         foreach (var file in files)

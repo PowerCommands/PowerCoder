@@ -13,7 +13,7 @@ configuration:
     suggestions:  
     - exit
     - cd PainKiller.CommandPrompt.CoreLib\Core
-    roamingDirectory: CommandPrompt
+    roamingDirectory: PowerCoder
     modules:
       security:
         secrets:

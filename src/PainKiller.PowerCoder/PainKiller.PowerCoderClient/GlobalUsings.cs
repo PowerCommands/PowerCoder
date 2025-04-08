@@ -15,5 +15,4 @@ global using PainKiller.CommandPrompt.CoreLib.Modules.OllamaModule.Services;
 global using PainKiller.PowerCoderClient.Configuration;
 global using PainKiller.PowerCoderClient.Extensions;
 global using PainKiller.PowerCoderClient.Managers;
-global using PainKiller.PowerCoderClient.Prompts;
 global using PainKiller.ReadLine.Managers;
