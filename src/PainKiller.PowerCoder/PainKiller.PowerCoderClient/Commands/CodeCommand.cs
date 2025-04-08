@@ -1,6 +1,5 @@
 using System.Text;
 using PainKiller.PowerCoderClient.BaseClasses;
-using PainKiller.PowerCoderClient.DomainObjects;
 
 namespace PainKiller.PowerCoderClient.Commands;
 
@@ -13,8 +12,6 @@ public class CodeCommand : PowerCodeBaseCommando
     
     public override RunResult Run(ICommandLineInput input)
     {
-        if (input.HasOption("add")) return Add();
-
         var path = input.GetFullPath();
         if (string.IsNullOrWhiteSpace(path) || (!File.Exists(path) && !Directory.Exists(path)))
         {
@@ -35,14 +32,6 @@ public class CodeCommand : PowerCodeBaseCommando
         Writer.WriteDescription("Files", files.Length.ToString());
         Writer.WriteLine("All content copied to clipboard");
         TextCopy.ClipboardService.SetText(contentAllFiles.ToString());
-        return Ok();
-    }
-    private RunResult Add()
-    {
-        var id = DialogService.QuestionAnswerDialog("Id of your pattern: ");
-        var pattern = DialogService.QuestionAnswerDialog("Pattern: ");
-        var isAntiPattern = DialogService.YesNoDialog("Is anti pattern (means match is not success) : ");
-        CodePatterns.Insert(new CodePattern { Id = id, Pattern = pattern, AntiPattern = isAntiPattern }, codePattern => codePattern.Id == id);
         return Ok();
     }
 }
