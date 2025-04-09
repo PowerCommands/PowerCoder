@@ -1,5 +1,4 @@
 using PainKiller.PowerCoderClient.BaseClasses;
-using PainKiller.PowerCoderClient.DomainObjects;
 
 namespace PainKiller.PowerCoderClient.Commands;
 
@@ -15,30 +14,21 @@ public class SuggestionCommand : PowerCodeBaseCommando
         var config = Configuration.Core.Modules.Ollama;
         var service = OllamaService.GetInstance(config.BaseAddress, config.Port, config.Model);
         var path = input.GetFullPath();
-        if (string.IsNullOrWhiteSpace(path) || (!File.Exists(path) && !Directory.Exists(path)))
+        if (string.IsNullOrWhiteSpace(path) || (!File.Exists(path)))
         {
-            Writer.WriteLine("Please provide a valid path to a file or directory.");
+            Writer.WriteLine("Please provide a valid path to a file.");
             return Nok("Invalid file path.");
         }
-        var search = DialogService.ChooseFromOptions("Pick a search criteria!", Configuration.PowerCoder.FindSearchTerms.ToList());
-        var files = Directory.GetFiles(path, "*.cs", SearchOption.AllDirectories);
+        var search = $"Do you have any suggestion for improvements?";
         Writer.Clear();
         service.Reset();
-
-        var searchPrompt = new CriteriaCodePrompt("search", search, ["namespace MyNamespace;"]);
-        Writer.WriteDescription("Criteria", $"{searchPrompt.Criteria} {search}");
+        Writer.WriteDescription("Question", $"{path} {search}");
         
-        foreach (var file in files)
-        {
-            var content = File.ReadAllText(file);
-            var prompt = searchPrompt.GeneratePrompt(file, content);
-            service.AddMessage(new ChatMessage("user", prompt));
-            var response = service.SendChatToOllama().GetAwaiter().GetResult();
-            if(response.Length > 1000) Writer.WriteLine($"{file} = No match");
-            else if(response.ToLower().Contains("no match")) Writer.WriteLine(response);
-            else Writer.WriteSuccessLine(response);
-            service.AddMessage(new ChatMessage("assistant", response));
-        }
+        var content = File.ReadAllText(path);
+        service.AddMessage(new ChatMessage("user", $"{search}\n{content}"));
+        var response = service.SendChatToOllama().GetAwaiter().GetResult();
+        service.AddMessage(new ChatMessage("assistant", response));
+        Writer.WriteLine(response);
         while (true)
         {
             Writer.Write("Any further questions?> ");
@@ -46,7 +36,20 @@ public class SuggestionCommand : PowerCodeBaseCommando
             
             if (string.IsNullOrWhiteSpace(userInput)) continue;
             if (userInput.Trim().Equals("/bye", StringComparison.OrdinalIgnoreCase)) break;
+            service.AddMessage(new ChatMessage("user", $"{search}\n{content}"));
+            service.AddMessage(new ChatMessage("assistant", response));
+            Writer.WriteLine(response);
         }
         return Ok();
+    }
+    protected override void UpdateSuggestions(string newWorkingDirectory)
+    {
+        if (Directory.Exists(newWorkingDirectory))
+        {
+            var files = Directory.GetFiles(newWorkingDirectory)
+                .Select(f => new FileInfo(f).Name)
+                .ToArray();
+            SuggestionProviderManager.AppendContextBoundSuggestions(Identifier, files.Select(e => e).ToArray());
+        }
     }
 }

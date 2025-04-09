@@ -8,7 +8,7 @@ public abstract class PowerCodeBaseCommando(string identifier) : ConsoleCommandB
         InfoPanelService.Instance.RegisterContent(new DefaultInfoPanel(new DefaultInfoPanelContent()));
     }
     protected void OnWorkingDirectoryChanged(WorkingDirectoryChangedEventArgs e) => UpdateSuggestions(e.NewWorkingDirectory);
-    private void UpdateSuggestions(string newWorkingDirectory)
+    protected virtual void UpdateSuggestions(string newWorkingDirectory)
     {
         if (Directory.Exists(newWorkingDirectory))
         {
