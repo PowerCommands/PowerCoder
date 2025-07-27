@@ -13,31 +13,44 @@ public static class Startup
 {
     public static CommandLoop Build()
     {
-        var config = ReadConfiguration();
-        
-        var logger = LoggerProvider.CreateLogger<Program>();
-        logger.LogInformation($"{config.Core.Name} started, configuration read and logging initialized.");
-
-        ShowLogo(config.Core);
-        EventBusService.Service.Subscribe<SetupRequiredEventArgs>(args =>
+        try
         {
-            logger.LogInformation($"Setup required: {args.Description}");
-            args.SetupAction?.Invoke();
-        });
-        var commands = CommandDiscoveryService.DiscoverCommands(config);
-        foreach (var consoleCommand in commands) consoleCommand.OnInitialized();
-        
-        var suggestions = new List<string>();
-        suggestions.AddRange(config.Core.Suggestions);
-        suggestions.AddRange(commands.Select(c => c.Identifier).ToArray());
-        ReadLineService.InitializeAutoComplete([], suggestions.ToArray());
-        
-        logger.LogDebug($"Suggestions: {string.Join(',', suggestions)}");
-        
-        EventBusService.Service.Publish(new WorkingDirectoryChangedEventArgs(Environment.CurrentDirectory));
-        logger.LogDebug($"{nameof(EventBusService)} publish: {nameof(WorkingDirectoryChangedEventArgs)} {Environment.CurrentDirectory}");
+            var config = ReadConfiguration();
+            var logger = LoggerProvider.CreateLogger<Program>();
+            
+            logger.LogInformation($"{config.Core.Name} started, configuration read and logging initialized.");
 
-        return new CommandLoop(new CommandRuntime(commands), new ReadLineInputReader(), config.Core);
+            ShowLogo(config.Core);
+            EventBusService.Service.Subscribe<SetupRequiredEventArgs>(args =>
+            {
+                logger.LogInformation($"Setup required: {args.Description}");
+                args.SetupAction?.Invoke();
+            });
+            var commands = CommandDiscoveryService.DiscoverCommands(config);
+            foreach (var consoleCommand in commands)
+            {
+                consoleCommand.OnInitialized();
+            }
+        
+            var suggestions = new List<string>();
+            suggestions.AddRange(config.Core.Suggestions);
+            suggestions.AddRange(commands.Select(c => c.Identifier).ToArray());
+            ReadLineService.InitializeAutoComplete([], suggestions.ToArray());
+            logger.LogDebug($"Suggestions: {string.Join(',', suggestions)}");
+        
+            EventBusService.Service.Publish(new WorkingDirectoryChangedEventArgs(Environment.CurrentDirectory));
+            logger.LogDebug($"{nameof(EventBusService)} publish: {nameof(WorkingDirectoryChangedEventArgs)} {Environment.CurrentDirectory}");
+
+            Console.WriteLine($"Current directory: {Environment.CurrentDirectory}");
+            return new CommandLoop(new CommandRuntime(commands), new ReadLineInputReader(), config.Core);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred during startup: {ex.Message}");
+            Console.ReadLine();
+            Environment.Exit(1);
+            return null!; // Unreachable, but required for compilation
+        }
     }
     private static CommandPromptConfiguration ReadConfiguration()
     {
