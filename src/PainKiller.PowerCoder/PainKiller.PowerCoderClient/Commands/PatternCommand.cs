@@ -23,7 +23,8 @@ public class PatternCommand : PowerCodeBaseCommando
             Writer.WriteLine("Please provide a valid path to a file or directory.");
             return Nok("Invalid file path.");
         }
-        var selectedPattern = DialogService.ChooseFromOptions("Pick a pattern!", CodePatterns.GetItems().Select(p => p.Id).ToList());
+
+        var selectedPattern = ListService.ListDialog("Pick a pattern!", CodePatterns.GetItems().Select(p => p.Id).ToList()).First().Value;
         var files = Directory.GetFiles(path, "*.cs", SearchOption.AllDirectories);
         Writer.Clear();
 

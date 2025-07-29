@@ -5,7 +5,6 @@ using Spectre.Console;
 namespace PainKiller.CommandPrompt.CoreLib.Core.Utils;
 public static class MarkdownToSpectreConverter
 {
-    //Hejsan hoppsan hur är det med dig då
     public static string Convert(string markdown)
     {
         var lines = markdown.Split('\n');
@@ -43,7 +42,7 @@ public static class MarkdownToSpectreConverter
 
     private static string ConvertInline(string line)
     {
-        line = Markup.Escape(line); // För att undvika oönskade markup-problem
+        line = Markup.Escape(line);
         line = Regex.Replace(line, @"\*\*(.+?)\*\*", "[bold]$1[/]");
         line = Regex.Replace(line, @"\*(.+?)\*", "[italic]$1[/]");
         line = Regex.Replace(line, @"`(.+?)`", "[grey]$1[/]");

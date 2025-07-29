@@ -1,2 +1,2 @@
 using PainKiller.PowerCoderClient.Bootstrap;
-Startup.Build().Start();
+Startup.Build().Start(args);

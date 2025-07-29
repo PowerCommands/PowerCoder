@@ -4,7 +4,7 @@ using PainKiller.PowerCoderClient.BaseClasses;
 namespace PainKiller.PowerCoderClient.Commands;
 
 [CommandDesign(     description: "Get all the code, copied to clipboard", 
-                        options: [""],
+                    suggestions: ["csharp", "javascript"],
                        examples: ["//Get all the code, copied to clipboard","code"])]
 public class CodeCommand : PowerCodeBaseCommando
 {
@@ -13,6 +13,7 @@ public class CodeCommand : PowerCodeBaseCommando
     public override RunResult Run(ICommandLineInput input)
     {
         var path = input.GetFullPath();
+        var fileType = input.Arguments.FirstOrDefault() == "javascript" ? ".js" : ".cs";  //default is C#
         if (string.IsNullOrWhiteSpace(path) || (!File.Exists(path) && !Directory.Exists(path)))
         {
             Writer.WriteLine("Please provide a valid path to a file or directory.");
@@ -20,7 +21,7 @@ public class CodeCommand : PowerCodeBaseCommando
         }
         Writer.Clear();
         Writer.WriteLine($"Iterate all files in directory [{path}]");
-        var files = Directory.GetFiles(path, "*.cs", SearchOption.AllDirectories);
+        var files = Directory.GetFiles(path, $"*.{fileType}", SearchOption.AllDirectories);
         var contentAllFiles = new StringBuilder();
         foreach (var file in files)
         {

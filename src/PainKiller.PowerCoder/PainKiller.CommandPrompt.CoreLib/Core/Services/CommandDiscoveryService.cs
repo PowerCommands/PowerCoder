@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
-using PainKiller.CommandPrompt.CoreLib.Metadata;
 using PainKiller.CommandPrompt.CoreLib.Core.Events;
+using PainKiller.CommandPrompt.CoreLib.Metadata;
 
 namespace PainKiller.CommandPrompt.CoreLib.Core.Services;
 

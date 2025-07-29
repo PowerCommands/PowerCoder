@@ -20,7 +20,7 @@ public class CriteriaCommand : PowerCodeBaseCommando
             Writer.WriteLine("Please provide a valid path to a file or directory.");
             return Nok("Invalid file path.");
         }
-        var search = DialogService.ChooseFromOptions("Pick a search criteria!", Configuration.PowerCoder.FindSearchTerms.ToList());
+        var search = ListService.ListDialog("Pick a search criteria!", Configuration.PowerCoder.FindSearchTerms.ToList()).First().Value;
         var files = Directory.GetFiles(path, "*.cs", SearchOption.AllDirectories);
         Writer.Clear();
         service.Reset();

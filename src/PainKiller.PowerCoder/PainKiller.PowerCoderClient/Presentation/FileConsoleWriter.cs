@@ -6,6 +6,11 @@ public class FileConsoleWriter(string filePath) : IConsoleWriter
 {
     private readonly SpectreConsoleWriter _consoleWriter = SpectreConsoleWriter.Instance;
 
+    public void WriteDescription(string label, string text, string title = "Description", bool writeToLog = true, Color? consoleColor = null, bool noBorder = false, string scope = "")
+    {
+        throw new NotImplementedException();
+    }
+
     public void Write(string text, bool writeLog = true, Color? consoleColor = null, string scope = "")
     {
         _consoleWriter.Write(text, writeLog, consoleColor, scope);
@@ -54,9 +59,14 @@ public class FileConsoleWriter(string filePath) : IConsoleWriter
         if (writeLog) WriteToFile("🔗 " + text);
     }
 
+    public void WriteSeparator(string separator = "-")
+    {
+        throw new NotImplementedException();
+    }
+
     public void WriteDescription(string label, string text, bool writeToLog = true, Color? consoleColor = null, bool noBorder = false, string scope = "")
     {
-        _consoleWriter.WriteDescription(label, text, writeToLog, consoleColor, noBorder, scope);
+        _consoleWriter.WriteDescription(label, text, "", writeToLog, consoleColor, noBorder, scope);
         if (writeToLog) WriteToFile($"{label}: {text}");
     }
 

@@ -22,21 +22,6 @@ public static class DialogService
         var result = AnsiConsole.Prompt(prompt);
         return result == "Yes";
     }
-    public static string ChooseFromOptions(string question, List<string>? choices = null)
-    {
-        // Default choices if none provided
-        choices ??= new List<string> { "No choises defined" };
-
-        // Create the prompt with the given choices
-        var prompt = new SelectionPrompt<string>()
-            .Title(question)
-            .PageSize(10)  // Show up to 10 choices at a time
-            .MoreChoicesText("[grey](Move up and down to reveal more)[/]")
-            .AddChoices(choices);
-
-        // Prompt the user and return the selected choice
-        return AnsiConsole.Prompt(prompt);
-    }
     public static string GetSecret(string artifact = "password")
     {
         string password;
