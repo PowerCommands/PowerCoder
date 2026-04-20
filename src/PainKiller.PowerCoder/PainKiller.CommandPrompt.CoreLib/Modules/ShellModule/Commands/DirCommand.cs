@@ -30,10 +30,12 @@ namespace PainKiller.CommandPrompt.CoreLib.Modules.ShellModule.Commands;
 )]
 public class DirCommand : ConsoleCommandBase<ApplicationConfiguration>
 {
+    const string DirType = "<DIR>";
     private void OnWorkingDirectoryChanged(WorkingDirectoryChangedEventArgs e) => UpdateSuggestions(e.NewWorkingDirectory);
     public DirCommand(string identifier) : base(identifier) => EventBusService.Service.Subscribe<WorkingDirectoryChangedEventArgs>(OnWorkingDirectoryChanged);
     public override RunResult Run(ICommandLineInput input)
     {
+        
         if (input.Options.ContainsKey("drive-info")) return ShowDriveInfo();
         
         var path = input.GetFullPath();
@@ -76,7 +78,7 @@ public class DirCommand : ConsoleCommandBase<ApplicationConfiguration>
             entries.Add(new DirEntry
             {
                 Name = dir.Name,
-                Type = "<DIR>",
+                Type = DirType,
                 SizeInBytes = size,
                 Size = size.GetDisplayFormattedFileSize(),
                 Updated = dir.LastWriteTime.GetDisplayTimeSinceLastUpdate(),
@@ -245,8 +247,14 @@ public class DirCommand : ConsoleCommandBase<ApplicationConfiguration>
     }
     private void OnSelected(DirEntry entry)
     {
+        if (entry.Type == DirType)
+        {
+            Environment.CurrentDirectory = Path.Combine(Environment.CurrentDirectory, entry.Name);
+            EventBusService.Service.Publish(new WorkingDirectoryChangedEventArgs(Environment.CurrentDirectory));
+        }
         Writer.Clear();
         Writer.WriteTable([entry]);
+        Writer.WriteLine(Environment.CurrentDirectory);
     }
     private void UpdateSuggestions(string newWorkingDirectory)
     {
